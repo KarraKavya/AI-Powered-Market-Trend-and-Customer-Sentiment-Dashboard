@@ -1,0 +1,6 @@
+env/
+.env
+__pycache__/
+*.pyc
+consumer_sentiment_faiss/
+consumer_sentiment_faiss1/
