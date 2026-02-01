@@ -18,6 +18,13 @@ import threading
 import time
 from external_api import reddit_api, news
 
+#for groq
+
+import os
+import pandas as pd
+from dotenv import load_dotenv
+from groq import Groq
+import notification
 
 def run_scheduler():
     
@@ -109,6 +116,21 @@ if __name__ == "__main__":
         return genai.Client(api_key=os.getenv("Gemini_Api_key"))
 
     client = load_gemini_client()
+
+
+    
+# -------------------------------------------------
+# GROQ API CONFIG (LIKE GEMINI)
+# -------------------------------------------------
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+if not GROQ_API_KEY:
+    raise Exception("GROQ API key not found in .env file")
+
+groq_client = Groq(api_key=GROQ_API_KEY)
+
+
+
 
     main_col, right_sidebar = st.columns([3,1])
 
@@ -424,3 +446,25 @@ if __name__ == "__main__":
 
             #grok 
             
+            # ===============================
+            # GROQ
+            # ===============================
+        else:
+            response = groq_client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=[
+                    {
+                            "role": "system",
+                            "content": "You are a market intelligence analyst. Use only the given context."
+                    },
+                    {
+                            "role": "user",
+                            "content": prompt
+                     }
+                    ],
+                    temperature=0.2
+                 )
+        answer = response.choices[0].message.content
+
+        st.success(f"Insight Generated using {llm_choice}")
+        st.write(answer)
